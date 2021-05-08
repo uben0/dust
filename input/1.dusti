@@ -1,0 +1,30 @@
+n := {
+    x := 2 + 3;
+    val x * 2;
+};
+n = 3 * {
+    val 2 + 1;
+};
+
+if a {
+    b = 0;
+};
+
+
+# n := if a { then b; else c;};
+# n := if a {
+#     then b;
+#     else c;
+# };
+
+# n := match a {
+#     0 then b;
+#     1 then c;
+#     _ then d;
+# };
+
+i := 0;
+while i < 10 {
+    i = i + 1;
+    print i;
+};

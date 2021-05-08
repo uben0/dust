@@ -1,0 +1,70 @@
+use std::str::FromStr;
+use crate::ast::*;
+
+grammar;
+
+Stmt: Stmt = {
+    <i:Ident> ":=" <e:Expr> => Stmt::Let(i, e),
+    <i:Ident> "=" <e:Expr> => Stmt::Mut(i, e),
+    <e:Expr> => Stmt::Eval(e),
+    "print" <e:Expr> => Stmt::Print(e),
+    "while" <e:Expr> "{" <s:Seq> "}" => Stmt::While(e, s),
+    "if" <e:Expr> "{" <s:Seq> "}" => Stmt::If(e, s),
+}
+
+pub Seq: Expr = {
+    <s:(<Stmt> ";")*> <e:("val" <Expr> ";")?> => Expr::Seq(s, e.map(|e| Box::new(e))),
+}
+
+Expr = Expr5;
+
+BinOp5: BinOp = {
+    "<"  => BinOp::Le,
+    "<=" => BinOp::LeEq,
+    ">"  => BinOp::Gr,
+    ">=" => BinOp::GrEq,
+    "==" => BinOp::Eq,
+    "!=" => BinOp::NotEq,
+}
+BinOp4: BinOp = {
+    "+"  => BinOp::Add,
+    "-"  => BinOp::Sub,
+}
+BinOp3: BinOp = {
+    "*"  => BinOp::Mul,
+    "/"  => BinOp::Div,
+}
+
+Expr5: Expr = {
+    Expr4,
+    <l:Expr5> <o:BinOp5> <r:Expr4> => Expr::BinOp(o, l.into(), r.into()),
+}
+Expr4: Expr = {
+    Expr3,
+    <l:Expr4> <o:BinOp4> <r:Expr3> => Expr::BinOp(o, l.into(), r.into()),
+}
+Expr3: Expr = {
+    Term,
+    <l:Expr3> <o:BinOp3> <r:Term> => Expr::BinOp(o, l.into(), r.into()),
+}
+
+// Expr2: Expr = {
+//     Expr1,
+//     // <l:Expr2> <r:Expr1> => Expr::Apply(l.into(), r.into()),
+//     // "input" <t:Type> => Expr::Input(t),
+// }
+
+// Expr1: Expr = {
+//     Expr0,
+//     // <l:Expr1> "." <r:Ident> => Expr::Query(l.into(), r),
+// }
+
+Term: Expr = {
+    <l:LiteralInt> => Expr::Value(l),
+    <i:Ident> => Expr::Ident(i),
+    "(" <e:Expr> ")" => e,
+    "{" <s:Seq> "}" => s,
+}
+
+Ident: String = <s:r"[a-z_]+"> => s.into();
+LiteralInt: i32 = <s:r"[0-9]+"> => i32::from_str(s).unwrap();
