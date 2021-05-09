@@ -1,9 +1,8 @@
 #[macro_use] extern crate lalrpop_util;
 lalrpop_mod!(pub grammar);
 
-mod env;
 mod ast;
-
+use ast::env::*;
 use std::io::Read;
 use structopt::StructOpt;
 
@@ -19,7 +18,9 @@ fn main() {
     file.read_to_string(&mut source).unwrap();
     match grammar::SeqParser::new().parse(&source) {
         Ok(s) => {
-            println!("{:#?}", s);
+            // println!("{:#?}", s);
+            s.eval(&mut EnvFrame::new(None));
+            // println!("-> {:?}", );
         }
         Err(e) => {
             println!("{}", e);

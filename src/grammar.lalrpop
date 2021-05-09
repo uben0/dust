@@ -68,3 +68,7 @@ Term: Expr = {
 
 Ident: String = <s:r"[a-z_]+"> => s.into();
 LiteralInt: i32 = <s:r"[0-9]+"> => i32::from_str(s).unwrap();
+LiteralBool: bool = {
+    "true" => true,
+    "false" => false,
+}
