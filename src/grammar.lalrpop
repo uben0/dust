@@ -60,15 +60,15 @@ Expr3: Expr = {
 // }
 
 Term: Expr = {
-    <l:LiteralInt> => Expr::Value(l),
+    <l:Literal> => Expr::Value(l),
     <i:Ident> => Expr::Ident(i),
     "(" <e:Expr> ")" => e,
     "{" <s:Seq> "}" => s,
 }
 
 Ident: String = <s:r"[a-z_]+"> => s.into();
-LiteralInt: i32 = <s:r"[0-9]+"> => i32::from_str(s).unwrap();
-LiteralBool: bool = {
-    "true" => true,
-    "false" => false,
+Literal: Value = {
+    <s:r"[0-9]+"> => Value::Int(i32::from_str(s).unwrap()),
+    "true" => Value::Bool(true),
+    "false" => Value::Bool(false),
 }

@@ -3,15 +3,15 @@ use env::*;
 
 #[derive(Debug)]
 pub enum Expr {
-    Value(i32),
+    Value(Value),
     Ident(String),
     BinOp(BinOp, Box<Self>, Box<Self>),
     Seq(Vec<Stmt>, Option<Box<Self>>),
 }
 impl Expr {
-    pub fn eval(&self, stack: &mut EnvFrame<i32>) -> i32 {
+    pub fn eval(&self, stack: &mut EnvFrame<Value>) -> Value {
         match self {
-            Self::Value(v) => *v,
+            Self::Value(v) => v.clone(),
             Self::Ident(i) => stack.get(i).unwrap_or_else(
                 || panic!("value {:?} not found in stack", i)
             ).clone(),
@@ -22,7 +22,7 @@ impl Expr {
                 if let Some(v) = v {
                     v.eval(&mut stack)
                 } else {
-                    0
+                    Value::Int(0)
                 }
             }
         }
@@ -65,7 +65,7 @@ pub enum Stmt {
     Print(Expr),
 }
 impl Stmt {
-    fn eval(&self, stack: &mut EnvFrame<i32>) {
+    fn eval(&self, stack: &mut EnvFrame<Value>) {
         match self {
             Self::Let(i, e) => {
                 let val = e.eval(stack);
@@ -83,12 +83,12 @@ impl Stmt {
                 println!("{:?}", e.eval(stack));
             }
             Self::While(c, b) => {
-                while c.eval(stack) != 0 {
+                while c.eval(stack).downcast_bool() {
                     b.eval(stack);
                 }
             }
             Self::If(c, b) => {
-                if c.eval(stack) != 0 {
+                if c.eval(stack).downcast_bool() {
                     b.eval(stack);
                 }
             }
@@ -110,24 +110,56 @@ pub enum BinOp {
     GrEq,
 }
 impl BinOp {
-    fn eval(self, l: i32, r: i32) -> i32 {
+    fn symbol(self) -> &'static str {
         match self {
-            Self::Add   => l + r,
-            Self::Sub   => l - r,
-            Self::Mul   => l * r,
-            Self::Div   => l / r,
-            Self::Eq    => if l == r {1} else {0},
-            Self::NotEq => if l != r {1} else {0},
-            Self::Le    => if l <  r {1} else {0},
-            Self::LeEq  => if l <= r {1} else {0},
-            Self::Gr    => if l >  r {1} else {0},
-            Self::GrEq  => if l >= r {1} else {0},
+            Self::Add   => "+",
+            Self::Sub   => "-",
+            Self::Mul   => "*",
+            Self::Div   => "/",
+            Self::Eq    => "==",
+            Self::NotEq => "!=",
+            Self::Le    => "<",
+            Self::LeEq  => "<=",
+            Self::Gr    => ">",
+            Self::GrEq  => ">=",
+        }
+    }
+    fn eval(self, l: Value, r: Value) -> Value {
+        use Value::*;
+        match (self, l, r) {
+            (Self::Add  , Int( l), Int( r)) => Int( l +  r),
+            (Self::Sub  , Int( l), Int( r)) => Int( l -  r),
+            (Self::Mul  , Int( l), Int( r)) => Int( l *  r),
+            (Self::Div  , Int( l), Int( r)) => Int( l /  r),
+            (Self::Eq   , Int( l), Int( r)) => Bool(l == r),
+            (Self::NotEq, Int( l), Int( r)) => Bool(l != r),
+            (Self::Le   , Int( l), Int( r)) => Bool(l <  r),
+            (Self::LeEq , Int( l), Int( r)) => Bool(l <= r),
+            (Self::Gr   , Int( l), Int( r)) => Bool(l >  r),
+            (Self::GrEq , Int( l), Int( r)) => Bool(l >= r),
+            (Self::Eq   , Bool(l), Bool(r)) => Bool(l == r),
+            (Self::NotEq, Bool(l), Bool(r)) => Bool(l != r),
+            (o, l, r) => panic!("undefined operation: {} {} {}", l.type_name(), o.symbol(), r.type_name()),
         }
     }
 }
 
-// #[derive(Debug, Clone)]
-// pub enum Value {
-//     Int(i32),
-//     Bool(bool),
-// }
+#[derive(Debug, Clone)]
+pub enum Value {
+    Int(i32),
+    Bool(bool),
+}
+impl Value {
+    fn type_name(&self) -> &'static str {
+        match self {
+            Self::Int( ..) => "int",
+            Self::Bool(..) => "bool",
+        }
+    }
+    fn downcast_bool(self) -> bool {
+        match self {
+            Self::Bool(v) => v,
+            v => panic!("failed to dowcast value {:?} to bool", v),
+        }
+    }
+}
