@@ -5,11 +5,12 @@ grammar;
 
 Stmt: Stmt = {
     <i:Ident> ":=" <e:Expr> => Stmt::Let(i, e),
+    "fn" <i:Ident> <p:Ident+> ":=" <e:Expr> => Stmt::Fn(i, p, e),
     <i:Ident> "=" <e:Expr> => Stmt::Mut(i, e),
     <e:Expr> => Stmt::Eval(e),
     "print" <e:Expr> => Stmt::Print(e),
-    "while" <e:Expr> "{" <s:Seq> "}" => Stmt::While(e, s),
-    "if" <e:Expr> "{" <s:Seq> "}" => Stmt::If(e, s),
+    "while" <c:Expr> "then" <b:Expr> => Stmt::While(c, b),
+    "if" <c:Expr> "then" <b:Expr> => Stmt::If(c, b),
 }
 
 pub Seq: Expr = {
@@ -44,15 +45,14 @@ Expr4: Expr = {
     <l:Expr4> <o:BinOp4> <r:Expr3> => Expr::BinOp(o, l.into(), r.into()),
 }
 Expr3: Expr = {
-    Term,
-    <l:Expr3> <o:BinOp3> <r:Term> => Expr::BinOp(o, l.into(), r.into()),
+    Expr2,
+    <l:Expr3> <o:BinOp3> <r:Expr2> => Expr::BinOp(o, l.into(), r.into()),
 }
-
-// Expr2: Expr = {
-//     Expr1,
-//     // <l:Expr2> <r:Expr1> => Expr::Apply(l.into(), r.into()),
-//     // "input" <t:Type> => Expr::Input(t),
-// }
+Expr2: Expr = {
+    Term,
+    <l:Expr2> <r:Term> => Expr::Apply(l.into(), r.into()),
+    // "input" <t:Type> => Expr::Input(t),
+}
 
 // Expr1: Expr = {
 //     Expr0,
@@ -64,6 +64,7 @@ Term: Expr = {
     <i:Ident> => Expr::Ident(i),
     "(" <e:Expr> ")" => e,
     "{" <s:Seq> "}" => s,
+    "cond" "{" <b:(<Expr> "then" <Expr> ";")*> "}" => Expr::Cond(b),
 }
 
 Ident: String = <s:r"[a-z_]+"> => s.into();

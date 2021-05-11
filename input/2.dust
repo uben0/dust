@@ -1,0 +1,38 @@
+fn fib := match
+    0 then 0
+    1 then 1
+    n then fib (n-1) + fib (n-2)
+
+ 
+i := () {
+    match {
+        n then n;
+    };
+    e;
+}
+
+fn add x y := x + y;
+
+x := add :. {
+    54;
+    74;
+    876;
+};
+
+x := :.
+    match
+        0 then panic
+        n then n
+    e
+
+x := :. {
+    match {
+        0 then panic;
+        n then n;
+    };
+    e;
+};
+
+l := [ (,)::
+    45
+]

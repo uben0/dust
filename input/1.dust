@@ -1,0 +1,11 @@
+# n := match {
+#     0 then b;
+#     1 then c;
+#     _ then d;
+# } a;
+
+fn fib := match {
+    0 then 0;
+    1 then 1;
+    _ then fib (n - 1) + fib (n - 2);
+};
