@@ -1,6 +1,8 @@
 pub mod env;
 use env::*;
 
+pub mod context;
+
 #[derive(Debug, Clone)]
 pub enum Expr {
     Value(Value),
@@ -59,32 +61,6 @@ impl Expr {
             }
         }
     }
-    // pub fn reduce(self, env: &dyn Env<Option<i32>>) -> Self {
-    //     match self {
-    //         Self::Value(v) => Self::Value(v),
-    //         Self::Ident(i) => match env.get(&i).unwrap_or_else(
-    //             || panic!("value {:?} not found in stack", i)
-    //         ) {
-    //             Some(v) => Self::Value(v),
-    //             None    => Self::Ident(i),
-    //         }
-    //         Self::BinOp(o, l, r) => {
-    //             match (l.reduce(env), r.reduce(env)) {
-    //                 (Self::Value(l), Self::Value(r)) => Self::Value(o.eval(l, r)),
-    //                 (l, r) => Self::BinOp(o, l, r),
-    //             }
-    //         }
-    //         Self::Seq(s, v) => {
-    //             let mut env = EnvFrame::new(Some(env));
-    //             s.iter().for_each(|s| s.eval(&mut stack));
-    //             if let Some(v) = v {
-    //                 v.eval(&mut stack)
-    //             } else {
-    //                 0
-    //             }
-    //         }
-    //     }
-    // }
 }
 
 #[derive(Debug, Clone)]

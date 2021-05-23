@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-// use std::collections::HashSet;
 
 pub trait Env<T> {
     fn get(&self, name: &str) -> Option<&T>;
@@ -33,22 +32,3 @@ impl<'a, T> Env<T> for EnvFrame<'a, T> {
         }
     }
 }
-
-// pub EnvLambda<'a, T> {
-//     pred: Option<&'a dyn Env<T>>,
-//     lambdas: HashSet<String>,
-// }
-// impl<'a, T> Env<Option<T>> for EnvLambda<'a, T> {
-//     fn set(&mut self, name: String, value: T) {
-//         self.frame.insert(name, value);
-//     }
-//     fn get(&self, name: &str) -> Option<&T> {
-//         self.frame.get(name).or_else(|| self.pred.as_ref().and_then(|p| p.get(name)))
-//     }
-//     fn get_mut(&mut self, name: &str) -> Option<&mut T> {
-//         match self.frame.get_mut(name) {
-//             Some(value) => Some(value),
-//             None => self.pred.as_mut().and_then(|p| p.get_mut(name)),
-//         }
-//     }
-// }
