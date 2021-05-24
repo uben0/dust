@@ -1,0 +1,32 @@
+{
+  "scopeName": "source.dust",
+  "patterns": [
+    {"include": "#operators"},
+    {"include": "#keywords"},
+    {"include": "#number"},
+    {"include": "#boolean"},
+    {"include": "#ident"}
+  ],
+  "repository": {
+    "ident": {
+      "match": "[a-z_]+",
+      "name": "entity.name"
+    },
+    "number": {
+      "match": "[0-9]+",
+      "name": "constant.numeric"
+    },
+    "boolean": {
+      "match": "true|false",
+      "name": "constant.language"
+    },
+    "keywords": {
+      "match": "if|while|print|val|fn|then|cond|\\=|\\:\\=",
+      "name": "keyword.control"
+    },
+    "operators": {
+      "match": "\\+|\\-|\\*|\\/|\\=\\=|\\!\\=|\\<|\\>|\\<\\=|\\>\\=",
+      "name": "keyword.operator"
+    }
+  }
+}

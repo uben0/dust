@@ -1,0 +1,23 @@
+{
+  "name": "dust",
+  "version": "0.0.1",
+  "publisher": "uben",
+  "engines": {
+    "vscode": "0.10.x"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "dust",
+        "extensions": [".dust"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "dust",
+        "scopeName": "source.dust",
+        "path": "./syntaxes/dust.tmGrammar.json"
+      }
+    ]
+  }
+}
